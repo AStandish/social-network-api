@@ -4,18 +4,18 @@ const {
   getSingleUser,
   createUser,
   deleteUser,
-  createThought,
-  deleteThought,
+  addFriend,
+  deleteFriend,
 } = require("../../controllers/userController");
 
-// /api/students
+// /api/user
 router.route("/").get(getUser).post(createUser);
 
-// /api/students/:studentId
+// /api/users/:userId
 router.route("/:userId").get(getSingleUser).delete(deleteUser);
 
-// /api/students/:studentId/assignments
-router.route("/:userId/thought").post(createThought);
+// /api/user/:userId/friends
+router.route("/:userId/friends").post(addFriend);
 
-// /api/students/:studentId/assignments/:assignmentId
-router.route("/:userId/thought/:thoughtId").delete(deleteThought);
+// /api/user/:friendID/user/:friendId
+router.route("/:userId/friends/:friendId").delete(deleteFriend);

@@ -87,32 +87,30 @@ module.exports = {
       });
   },
 
-  // Add a reaction to a user
-  addReaction(req, res) {
-    console.log("You are adding a reaction");
-    console.log(req.body);
+  //add a friend
+  addFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $addToSet: { reactions: req.body } },
+      { $addToSet: { friends: req.params.friendId } },
       { runValidators: true, new: true }
     )
       .then((user) =>
         !user
-          ? res.status(404).json({ message: "No user found with that ID :(" })
+          ? res.status(404).json({ message: "No user found with this id" })
           : res.json(user)
       )
       .catch((err) => res.status(500).json(err));
   },
-  // Remove reaction from an user
-  removeReaction(req, res) {
+  //delete a friend
+  deleteFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $pull: { reaction: { reactionId: req.params.reactionId } } },
-      { runValidators: true, new: true }
+      { $pull: { friends: req.params.friendId } },
+      { new: true }
     )
       .then((user) =>
         !user
-          ? res.status(404).json({ message: "No user found with that ID :(" })
+          ? res.status(404).json({ message: "No user found with this id" })
           : res.json(user)
       )
       .catch((err) => res.status(500).json(err));
