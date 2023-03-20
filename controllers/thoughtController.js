@@ -21,7 +21,17 @@ module.exports = {
   // Create a thought
   createThought(req, res) {
     Thought.create(req.body)
-      .then(() => Thought.json(Thought))
+      .then((thought) =>
+        User.updateOne(
+          { _id: req.body.userId },
+          { $push: { thoughts: thought._id } }
+        )
+      )
+      .then((data) =>
+        !data.modifiedCount
+          ? res.status(404).json({ message: "User not found" })
+          : res.json({ message: "Thought was created successfully." })
+      )
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
@@ -33,9 +43,12 @@ module.exports = {
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: "There are no thoughts" })
-          : User.deleteMany({ _id: { $in: thought.User } })
+          : User.updateOne(
+              { thoughts: req.params.thoughtId },
+              { $pull: { thoughts: req.params.thoughtId } }
+            )
       )
-      .then(() => res.json({ message: "Thought and user deleted!" }))
+      .then(() => res.json({ message: "Thought deleted!" }))
       .catch((err) => res.status(500).json(err));
   },
   // Update a thought
@@ -74,7 +87,7 @@ module.exports = {
   removeReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reaction: { reactionId: req.params.reactionId } } },
+      { $pull: { reactions: { reactionId: req.params.reactionId } } },
       { runValidators: true, new: true }
     )
       .then((thought) =>

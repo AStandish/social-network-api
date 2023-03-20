@@ -1,34 +1,30 @@
 const { ObjectId } = require("mongoose").Types;
 const { User, Thought } = require("../models");
 
-
 module.exports = {
   // Get all users
   getUser(req, res) {
-    User.find().populate("friends")
-      .then(async (users) => {
-        const userObj = {
-          users,
-        };
-        return res.json(userObj);
+    User.find()
+      .populate("friends")
+      .populate("thoughts")
+      .then((users) => {
+        res.json(users);
       })
       .catch((err) => {
         console.log(err);
-        return res.status(500).jsn(err);
+        res.status(500).json(err);
       });
   },
   // Get a single user
   getSingleUser(req, res) {
     User.findOne({ _id: req.params.userId })
       .select("-__v")
-      .populate('friends')
-      .then(async (user) =>
+      .populate("friends")
+      .populate("thoughts")
+      .then((user) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
-          : res.json({
-              user,
-              overallReaction: await reaction(req.params.userId),
-            })
+          : res.json(user)
       )
       .catch((err) => {
         console.log(err);
